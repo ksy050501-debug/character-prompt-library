@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="./tag-manager.css">
 <link rel="stylesheet" href="./url-fix.css">
 <link rel="stylesheet" href="./editor-enhancements.css">
+<link rel="stylesheet" href="./favorite-order.css">
 </head>
 <body>
 <div class="app">
@@ -23,11 +24,11 @@
   </div>
 
   <div class="toolbar"><input class="search" id="search" placeholder="이름, 태그, 프롬프트 내용 검색..."><select id="sort"><option value="updated">최근 수정순</option><option value="used">최근 사용순</option><option value="title">이름순</option><option value="created">최근 생성순</option></select><select id="favFilter"><option value="all">전체</option><option value="fav">즐겨찾기만</option></select></div>
-  <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button><button class="tag-manage-tab" id="manageTagsBtn" type="button">태그 관리</button></div>
+  <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button><button class="fav-tab" id="favoriteOnlyBtn" type="button">★ 즐겨찾기</button><button class="tag-manage-tab" id="manageTagsBtn" type="button">태그 관리</button></div>
   <div class="stats" id="stats"></div>
   <div class="layout">
     <aside class="sidebar"><div class="sub">태그 필터</div><div class="tag-list" id="tagList"></div><button class="btn" id="clearTag" style="width:100%">태그 필터 해제</button><div class="help" style="margin-top:10px">데이터는 이 브라우저의 로컬 저장소에 저장됩니다. 기기 변경·브라우저 초기화에 대비해 가끔 백업을 내보내세요.</div></aside>
-    <main class="content"><div class="grid" id="grid"></div><div class="empty" id="empty" hidden>조건에 맞는 프롬프트가 없습니다.<br><br><button class="btn primary" id="emptyAdd">새 프롬프트 만들기</button></div></main>
+    <main class="content"><div class="favorite-order-note" id="favoriteOrderNote" hidden>즐겨찾기 전용 순서입니다. 카드의 ↑ ↓ 버튼으로 순서를 바꿀 수 있으며, 프롬프트를 수정해도 이 순서는 유지됩니다.</div><div class="grid" id="grid"></div><div class="empty" id="empty" hidden>조건에 맞는 프롬프트가 없습니다.<br><br><button class="btn primary" id="emptyAdd">새 프롬프트 만들기</button></div></main>
   </div>
 </div>
 
@@ -58,5 +59,6 @@
 <script src="./tag-manager.js"></script>
 <script src="./editor-enhancements.js"></script>
 <script src="./multi-tag-filter.js"></script>
+<script src="./favorite-order.js"></script>
 </body>
 </html>
