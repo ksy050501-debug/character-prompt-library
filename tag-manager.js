@@ -19,6 +19,7 @@
     draftItems=typeof structuredClone==='function'?structuredClone(readItems()):JSON.parse(JSON.stringify(readItems()));
     draftTags=readCatalog();
     selectedTag=draftTags[0]||'';
+    $('#tagPromptSearch').value='';
     render();
     $('#tagManager').showModal();
   }
@@ -26,6 +27,13 @@
     const m=new Map(draftTags.map(t=>[t,0]));
     draftItems.forEach(x=>(x.tags||[]).forEach(t=>m.set(t,(m.get(t)||0)+1)));
     return m;
+  }
+  function updateCountOnly(){
+    if(!selectedTag)return;
+    const total=draftItems.filter(x=>(x.tags||[]).includes(selectedTag)).length;
+    $('#tagSelectionCount').textContent=`${total}개 프롬프트에 적용 중`;
+    const btn=[...document.querySelectorAll('[data-manage-tag]')].find(b=>b.dataset.manageTag===selectedTag);
+    if(btn)btn.querySelector('small').textContent=String(total);
   }
   function render(){
     const c=counts();
@@ -37,8 +45,7 @@
       const on=(x.tags||[]).includes(selectedTag);
       return `<label class="prompt-check"><input type="checkbox" data-prompt-id="${esc(x.id)}" ${on?'checked':''}><span><b>${esc(x.title)}</b><small>${x.type==='situation'?'상황':'인물'}</small></span></label>`;
     }).join(''):'<div class="help" style="padding:14px">왼쪽에서 태그를 선택하세요.</div>';
-    const total=draftItems.filter(x=>(x.tags||[]).includes(selectedTag)).length;
-    $('#tagSelectionCount').textContent=selectedTag?`${total}개 프롬프트에 적용 중`:'';
+    updateCountOnly();
   }
   function addTag(){
     const input=$('#newTagName'),tag=input.value.trim();
@@ -79,12 +86,12 @@
     if(e.target.closest('#selectAllPrompts')){setAll(true);return}
     if(e.target.closest('#clearAllPrompts')){setAll(false);return}
     if(e.target.closest('#applyTagManager')){apply();return}
-    if(e.target.closest('#closeTagManager')){$('#tagManager').close();return}
+    if(e.target.closest('#closeTagManager')||e.target.closest('#cancelTagManager')){$('#tagManager').close();return}
   });
   document.addEventListener('change',e=>{
     const cb=e.target.closest('#tagPromptList [data-prompt-id]');if(!cb||!selectedTag)return;
     const x=draftItems.find(v=>v.id===cb.dataset.promptId);if(!x)return;
-    const set=new Set(x.tags||[]);cb.checked?set.add(selectedTag):set.delete(selectedTag);x.tags=[...set];render();
+    const set=new Set(x.tags||[]);cb.checked?set.add(selectedTag):set.delete(selectedTag);x.tags=[...set];updateCountOnly();
   });
   $('#newTagName')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addTag()}});
   $('#tagPromptSearch')?.addEventListener('input',render);
