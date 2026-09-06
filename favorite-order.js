@@ -4,10 +4,12 @@
   const $=s=>document.querySelector(s);
   const $$=s=>[...document.querySelectorAll(s)];
   let originalDateNow=null;
+  let arranging=false;
 
   function readItems(){try{const v=JSON.parse(localStorage.getItem(DATA_KEY));return Array.isArray(v)?v:[]}catch{return []}}
   function readOrder(){try{const v=JSON.parse(localStorage.getItem(ORDER_KEY));return Array.isArray(v)?v.map(String):[]}catch{return []}}
   function writeOrder(v){localStorage.setItem(ORDER_KEY,JSON.stringify(v))}
+  function favoriteMode(){return $('#favFilter')?.value==='fav'}
   function normalizeOrder(){
     const favIds=readItems().filter(x=>x.favorite).map(x=>String(x.id));
     const favSet=new Set(favIds);
@@ -17,34 +19,67 @@
     return order;
   }
   function refreshFavButton(){
-    const on=$('#favFilter')?.value==='fav';
+    const on=favoriteMode();
     $('#favoriteOnlyBtn')?.classList.toggle('active',on);
     document.body.classList.toggle('favorite-only-mode',on);
+    const note=$('#favoriteOrderNote');
+    if(note)note.hidden=!on;
+  }
+  function addMoveControls(card){
+    const actions=card.querySelector('.card-actions');
+    if(!actions||actions.querySelector('.fav-move-controls'))return;
+    const wrap=document.createElement('span');
+    wrap.className='fav-move-controls';
+    wrap.innerHTML='<button class="btn" type="button" data-fav-move="up" aria-label="즐겨찾기 순서 위로">↑</button><button class="btn" type="button" data-fav-move="down" aria-label="즐겨찾기 순서 아래로">↓</button>';
+    actions.appendChild(wrap);
+  }
+  function applyManualOrder(){
+    if(arranging)return;
+    refreshFavButton();
+    const grid=$('#grid');
+    if(!grid)return;
+    if(!favoriteMode()){
+      $$('.fav-move-controls').forEach(x=>x.remove());
+      return;
+    }
+    arranging=true;
+    const order=normalizeOrder();
+    const pos=new Map(order.map((id,i)=>[id,i]));
+    const cards=$$('#grid .card');
+    const desired=[...cards].sort((a,b)=>(pos.get(String(a.dataset.id))??Number.MAX_SAFE_INTEGER)-(pos.get(String(b.dataset.id))??Number.MAX_SAFE_INTEGER));
+    const current=cards.map(c=>String(c.dataset.id)).join('|');
+    const target=desired.map(c=>String(c.dataset.id)).join('|');
+    if(current!==target)desired.forEach(c=>grid.appendChild(c));
+    desired.forEach(addMoveControls);
+    arranging=false;
   }
   function triggerRefresh(){
     const fav=$('#favFilter');
     if(fav)fav.dispatchEvent(new Event('change',{bubbles:true}));
     window.dispatchEvent(new CustomEvent('favoriteorderchange'));
-    refreshFavButton();
+    setTimeout(applyManualOrder,40);
   }
   function move(id,dir){
     const order=normalizeOrder();
-    const i=order.indexOf(String(id));
-    if(i<0)return;
-    const j=dir==='up'?i-1:i+1;
-    if(j<0||j>=order.length)return;
+    applyManualOrder();
+    const visible=$$('#grid .card').map(c=>String(c.dataset.id));
+    const vi=visible.indexOf(String(id));
+    const vj=dir==='up'?vi-1:vi+1;
+    if(vi<0||vj<0||vj>=visible.length)return;
+    const other=visible[vj];
+    const i=order.indexOf(String(id)),j=order.indexOf(other);
+    if(i<0||j<0)return;
     [order[i],order[j]]=[order[j],order[i]];
     writeOrder(order);
-    triggerRefresh();
+    applyManualOrder();
   }
 
-  // 즐겨찾기 클릭 시 app.js가 updatedAt을 현재 시각으로 바꾸지 못하도록
-  // 해당 클릭 이벤트가 끝날 때까지만 Date.now()를 기존 updatedAt으로 고정한다.
+  // app.js의 즐겨찾기 처리에서 updatedAt을 갱신하지 못하도록
+  // 즐겨찾기 클릭 이벤트 동안만 Date.now()를 기존 updatedAt으로 고정한다.
   document.addEventListener('click',e=>{
     const star=e.target.closest('#grid [data-action="fav"]');
     if(!star)return;
-    const card=star.closest('.card');
-    const id=String(card?.dataset.id||'');
+    const id=String(star.closest('.card')?.dataset.id||'');
     const item=readItems().find(x=>String(x.id)===id);
     if(!item)return;
     if(!originalDateNow)originalDateNow=Date.now;
@@ -75,8 +110,13 @@
     }
   },true);
 
-  $('#favFilter')?.addEventListener('change',()=>setTimeout(refreshFavButton,0));
-  window.addEventListener('storage',()=>{normalizeOrder();refreshFavButton()});
+  $('#favFilter')?.addEventListener('change',()=>setTimeout(applyManualOrder,40));
+  ['search','sort'].forEach(id=>$('#'+id)?.addEventListener(id==='search'?'input':'change',()=>setTimeout(applyManualOrder,40)));
+  $$('.tab[data-type]').forEach(b=>b.addEventListener('click',()=>setTimeout(applyManualOrder,40)));
+  const grid=$('#grid');
+  if(grid)new MutationObserver(()=>setTimeout(applyManualOrder,0)).observe(grid,{childList:true,subtree:false});
+  window.addEventListener('favoriteorderchange',applyManualOrder);
+  window.addEventListener('storage',()=>{normalizeOrder();applyManualOrder()});
   normalizeOrder();
-  refreshFavButton();
+  setTimeout(applyManualOrder,60);
 })();
