@@ -1,0 +1,2 @@
+/* Prevent long URLs / unbroken strings from widening the UI */
+.content,.grid,.card,.card-top,.card-top>div,.preview,.viewer-body,.viewer-content,.modal-body,.field,.field textarea{min-width:0;max-width:100%}.preview,.viewer-content,.field textarea{overflow-wrap:anywhere;word-break:break-word;word-wrap:break-word}.viewer-content{overflow-x:hidden}.card{overflow:hidden}.grid{overflow:hidden}
