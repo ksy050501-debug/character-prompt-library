@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="./tag-enhancements.css">
 <link rel="stylesheet" href="./tag-manager.css">
 <link rel="stylesheet" href="./url-fix.css">
+<link rel="stylesheet" href="./editor-enhancements.css">
 </head>
 <body>
 <div class="app">
@@ -30,9 +31,9 @@
   </div>
 </div>
 
-<dialog id="editor"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="modalTitle">새 프롬프트</h2><button class="close" value="cancel">×</button></div><div class="modal-body"><input type="hidden" id="editId"><div class="row2"><div class="field"><label>분류</label><select id="type"><option value="person">인물</option><option value="situation">상황</option></select></div><div class="field"><label>이름</label><input id="title" required placeholder="예: 이세리 / 첫 만남"></div></div><div class="field"><label>태그</label><input id="tags" placeholder="쉼표로 구분: WERA, 지부장, S급"><div class="help">기존 태그를 클릭하면 자동으로 추가되며, 다시 클릭하면 해제됩니다.</div><div class="existing-tags" id="existingTagList"></div></div><div class="field"><label>프롬프트 본문</label><textarea id="content" required placeholder="복사할 프롬프트 전체 내용을 입력하세요."></textarea></div></div><div class="modal-foot"><button class="btn" value="cancel">취소</button><button class="btn primary" id="saveBtn" value="default">저장</button></div></form></dialog>
+<dialog id="editor"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="modalTitle">새 프롬프트</h2><button class="close" id="editorClose" type="button" aria-label="닫기">×</button></div><div class="modal-body"><input type="hidden" id="editId"><div class="row2"><div class="field"><label>분류</label><select id="type"><option value="person">인물</option><option value="situation">상황</option></select></div><div class="field"><label>이름</label><input id="title" required placeholder="예: 이세리 / 첫 만남"></div></div><div class="field"><label>태그</label><input id="tags" placeholder="쉼표로 구분: WERA, 지부장, S급"><div class="help">기존 태그를 클릭하면 자동으로 추가되며, 다시 클릭하면 해제됩니다.</div><div class="existing-tags" id="existingTagList"></div></div><div class="field"><label>프롬프트 본문</label><textarea id="content" required placeholder="복사할 프롬프트 전체 내용을 입력하세요."></textarea><div class="content-counter" id="contentCounter">0/2000</div></div></div><div class="modal-foot"><button class="btn" id="editorCancel" type="button">취소</button><button class="btn primary" id="saveBtn" type="button">저장</button></div></form></dialog>
 
-<dialog id="viewer"><div class="modal-head"><h2 id="viewerTitle">프롬프트 보기</h2><button class="close" id="viewerClose">×</button></div><div class="viewer-body"><div class="viewer-meta" id="viewerMeta"></div><div class="viewer-content" id="viewerContent"></div></div><div class="modal-foot"><button class="btn" id="viewerEdit">수정</button><button class="btn primary" id="viewerCopy">복사</button></div></dialog>
+<dialog id="viewer"><div class="modal-head"><h2 id="viewerTitle">프롬프트 보기</h2><button class="close" id="viewerClose">×</button></div><div class="viewer-body"><div class="viewer-meta" id="viewerMeta"></div><div class="viewer-content" id="viewerContent"></div></div><div class="modal-foot"><button class="btn" id="viewerEdit">수정</button><button class="btn primary" id="viewerCopy">복사</button></div><div class="modal-toast" id="viewerToast"></div></dialog>
 
 <dialog id="tagManager" class="tag-manager">
   <div class="modal-head"><h2>태그 관리</h2><button class="close" id="closeTagManager" type="button">×</button></div>
@@ -55,5 +56,6 @@
 <script src="./app.js"></script>
 <script src="./tag-enhancements.js"></script>
 <script src="./tag-manager.js"></script>
+<script src="./editor-enhancements.js"></script>
 </body>
 </html>
