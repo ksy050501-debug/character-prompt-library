@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prompt Library</title>
 <link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./tag-enhancements.css">
 </head>
 <body>
 <div class="app">
@@ -12,6 +13,12 @@
     <div class="brand"><div class="logo">P</div><div><h1>Prompt Library</h1><div class="sub">캐릭터챗 프롬프트 보관 · 검색 · 복사 · 백업</div></div></div>
     <div class="actions"><button class="btn" id="exportBtn">백업 내보내기</button><button class="btn" id="importBtn">백업 불러오기</button><button class="btn primary" id="addBtn">+ 새 프롬프트</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
   </div>
+
+  <div class="quick-tags">
+    <div class="quick-tags-label">태그 빠른 필터</div>
+    <div class="quick-tag-scroll" id="quickTagList"></div>
+  </div>
+
   <div class="toolbar"><input class="search" id="search" placeholder="이름, 태그, 프롬프트 내용 검색..."><select id="sort"><option value="updated">최근 수정순</option><option value="used">최근 사용순</option><option value="title">이름순</option><option value="created">최근 생성순</option></select><select id="favFilter"><option value="all">전체</option><option value="fav">즐겨찾기만</option></select></div>
   <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button></div>
   <div class="stats" id="stats"></div>
@@ -20,9 +27,12 @@
     <main class="content"><div class="grid" id="grid"></div><div class="empty" id="empty" hidden>조건에 맞는 프롬프트가 없습니다.<br><br><button class="btn primary" id="emptyAdd">새 프롬프트 만들기</button></div></main>
   </div>
 </div>
-<dialog id="editor"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="modalTitle">새 프롬프트</h2><button class="close" value="cancel">×</button></div><div class="modal-body"><input type="hidden" id="editId"><div class="row2"><div class="field"><label>분류</label><select id="type"><option value="person">인물</option><option value="situation">상황</option></select></div><div class="field"><label>이름</label><input id="title" required placeholder="예: 이세리 / 첫 만남"></div></div><div class="field"><label>태그</label><input id="tags" placeholder="쉼표로 구분: WERA, 지부장, S급"></div><div class="field"><label>프롬프트 본문</label><textarea id="content" required placeholder="복사할 프롬프트 전체 내용을 입력하세요."></textarea></div></div><div class="modal-foot"><button class="btn" value="cancel">취소</button><button class="btn primary" id="saveBtn" value="default">저장</button></div></form></dialog>
+
+<dialog id="editor"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="modalTitle">새 프롬프트</h2><button class="close" value="cancel">×</button></div><div class="modal-body"><input type="hidden" id="editId"><div class="row2"><div class="field"><label>분류</label><select id="type"><option value="person">인물</option><option value="situation">상황</option></select></div><div class="field"><label>이름</label><input id="title" required placeholder="예: 이세리 / 첫 만남"></div></div><div class="field"><label>태그</label><input id="tags" placeholder="쉼표로 구분: WERA, 지부장, S급"><div class="help">기존 태그를 클릭하면 자동으로 추가되며, 다시 클릭하면 해제됩니다.</div><div class="existing-tags" id="existingTagList"></div></div><div class="field"><label>프롬프트 본문</label><textarea id="content" required placeholder="복사할 프롬프트 전체 내용을 입력하세요."></textarea></div></div><div class="modal-foot"><button class="btn" value="cancel">취소</button><button class="btn primary" id="saveBtn" value="default">저장</button></div></form></dialog>
+
 <dialog id="viewer"><div class="modal-head"><h2 id="viewerTitle">프롬프트 보기</h2><button class="close" id="viewerClose">×</button></div><div class="viewer-body"><div class="viewer-meta" id="viewerMeta"></div><div class="viewer-content" id="viewerContent"></div></div><div class="modal-foot"><button class="btn" id="viewerEdit">수정</button><button class="btn primary" id="viewerCopy">복사</button></div></dialog>
 <div class="toast" id="toast"></div>
 <script src="./app.js"></script>
+<script src="./tag-enhancements.js"></script>
 </body>
 </html>
