@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prompt Library</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --panel:#121a2d;
+    --panel2:#18233b;
+    --line:#2a3858;
+    --text:#edf2ff;
+    --muted:#a8b3cc;
+    --accent:#7c9cff;
+    --accent2:#4f74ef;
+    --danger:#ff6b7a;
+    --ok:#62d3a3;
+    --shadow:0 12px 30px rgba(0,0,0,.25);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0a0f1d,#0d1424 30%,#0b1020);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;min-height:100vh}
+  button,input,textarea,select{font:inherit}
+  button{cursor:pointer}
+  .app{max-width:1400px;margin:0 auto;padding:24px}
+  .topbar{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#9e7cff);display:grid;place-items:center;box-shadow:var(--shadow);font-weight:800}
+  h1{font-size:24px;margin:0}.sub{font-size:13px;color:var(--muted);margin-top:3px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 13px;border-radius:11px;transition:.15s}
+  .btn:hover{transform:translateY(-1px);border-color:#49618f}
+  .btn.primary{background:var(--accent2);border-color:var(--accent2)}
+  .btn.danger{color:#ffd8dd;border-color:#6b2c39;background:#321722}
+  .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto;gap:10px;margin-bottom:14px}
+  .searchwrap{position:relative}.searchwrap input{width:100%;padding:12px 14px 12px 40px}
+  .searchicon{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.65}
+  input,textarea,select{border:1px solid var(--line);background:#0e1627;color:var(--text);border-radius:11px;outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+  .select{padding:11px 12px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted)}
+  .tab.active{color:white;border-color:var(--accent);background:#1a2850}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:6px 0 14px}
+  .stat{background:rgba(255,255,255,.03);border:1px solid var(--line);padding:7px 10px;border-radius:10px}
+  .layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px}
+  .sidebar{background:rgba(18,26,45,.9);border:1px solid var(--line);border-radius:var(--radius);padding:14px;height:fit-content;position:sticky;top:16px}
+  .side-title{font-size:13px;color:var(--muted);margin:4px 0 10px}
+  .tag-list{display:flex;gap:8px;flex-wrap:wrap;max-height:420px;overflow:auto}
+  .tag-chip{border:1px solid var(--line);background:#101a2d;color:#cfd8ee;border-radius:999px;padding:7px 10px;font-size:13px}
+  .tag-chip.active{background:#233665;border-color:var(--accent);color:#fff}
+  .clear-filter{width:100%;margin-top:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+  .card{background:linear-gradient(180deg,rgba(24,35,59,.96),rgba(18,26,45,.96));border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:0 7px 20px rgba(0,0,0,.12);display:flex;flex-direction:column;min-height:220px}
+  .card-top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+  .card-title{font-weight:750;font-size:17px;line-height:1.35;word-break:break-word}
+  .badge{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid var(--line);color:#c9d2e8;white-space:nowrap}
+  .badge.person{background:#16294b}.badge.situation{background:#352446}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+  .mini-tag{font-size:11px;color:#c3cce0;background:#0f1829;border:1px solid #293753;border-radius:999px;padding:4px 7px}
+  .preview{color:#b9c4db;font-size:13px;line-height:1.5;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;flex:1;margin-bottom:12px}
+  .card-actions{display:flex;gap:7px;flex-wrap:wrap}
+  .card-actions .btn{padding:8px 10px;font-size:13px}
+  .star{background:transparent;border:0;color:#8f9bb4;font-size:20px;padding:0 2px}.star.on{color:#ffd45c}
+  .empty{border:1px dashed var(--line);border-radius:16px;padding:50px 20px;text-align:center;color:var(--muted);background:rgba(255,255,255,.02)}
+  dialog{width:min(720px,calc(100vw - 24px));max-height:90vh;border:1px solid var(--line);border-radius:18px;background:#111a2d;color:var(--text);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  dialog::backdrop{background:rgba(3,7,15,.72);backdrop-filter:blur(3px)}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .modal-head h2{margin:0;font-size:18px}.close{border:0;background:transparent;color:#bcc7dc;font-size:24px}
+  .modal-body{padding:18px;display:grid;gap:12px;overflow:auto;max-height:calc(90vh - 130px)}
+  .field{display:grid;gap:6px}.field label{font-size:13px;color:#c7d0e2}.field input,.field textarea,.field select{padding:11px 12px}.field textarea{min-height:260px;resize:vertical;line-height:1.55}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#16223a;border:1px solid #38517e;color:#fff;padding:10px 14px;border-radius:11px;opacity:0;pointer-events:none;transition:.2s;z-index:9999;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .help{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}.sidebar{position:static}.toolbar{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.app{padding:14px}.grid{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}.sidebar{order:2}.content{order:1}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><div class="logo">P</div><div><h1>Prompt Library</h1><div class="sub">캐릭터챗 프롬프트 보관 · 검색 · 복사 · 백업</div></div></div>
+    <div class="actions">
+      <button class="btn" id="exportBtn">백업 내보내기</button>
+      <button class="btn" id="importBtn">백업 불러오기</button>
+      <button class="btn primary" id="addBtn">+ 새 프롬프트</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden />
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="searchwrap"><span class="searchicon">⌕</span><input id="search" placeholder="이름, 태그, 프롬프트 내용 검색..." /></div>
+    <select class="select" id="sort">
+      <option value="updated">최근 수정순</option>
+      <option value="used">최근 사용순</option>
+      <option value="title">이름순</option>
+      <option value="created">최근 생성순</option>
+    </select>
+    <select class="select" id="favFilter">
+      <option value="all">전체</option>
+      <option value="fav">즐겨찾기만</option>
+    </select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-type="all">전체</button>
+    <button class="tab" data-type="person">인물별</button>
+    <button class="tab" data-type="situation">상황별</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-title">태그 필터</div>
+      <div class="tag-list" id="tagList"></div>
+      <button class="btn clear-filter" id="clearTag">태그 필터 해제</button>
+      <div class="help">데이터는 이 브라우저의 로컬 저장소에 저장됩니다. 기기 변경·브라우저 초기화에 대비해 가끔 <b>백업 내보내기</b>를 눌러 JSON 파일을 보관하세요.</div>
+    </aside>
+    <main class="content">
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>조건에 맞는 프롬프트가 없습니다.<br><br><button class="btn primary" id="emptyAdd">새 프롬프트 만들기</button></div>
+    </main>
+  </div>
+</div>
+
+<dialog id="editor">
+  <form method="dialog" id="editorForm">
+    <div class="modal-head"><h2 id="modalTitle">새 프롬프트</h2><button class="close" value="cancel" aria-label="닫기">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+      <div class="row2">
+        <div class="field"><label>분류</label><select id="type"><option value="person">인물</option><option value="situation">상황</option></select></div>
+        <div class="field"><label>이름</label><input id="title" required placeholder="예: 이세리 / 첫 만남" /></div>
+      </div>
+      <div class="field"><label>태그</label><input id="tags" placeholder="쉼표로 구분: WERA, 지부장, S급" /></div>
+      <div class="field"><label>프롬프트 본문</label><textarea id="content" required placeholder="복사할 프롬프트 전체 내용을 입력하세요."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn" value="cancel">취소</button><button class="btn primary" id="saveBtn" value="default">저장</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'prompt_library_v1';
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const now = () => Date.now();
+  const uid = () => 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+
+  const sample = [
+    {id:uid(),type:'person',title:'예시 캐릭터',tags:['샘플','인물'],content:'이곳에 캐릭터 프롬프트를 입력하세요.\n\n[기본 설정]\n이름: ...\n성격: ...\n말투: ...',favorite:false,createdAt:now(),updatedAt:now(),lastUsedAt:0},
+    {id:uid(),type:'situation',title:'예시 상황',tags:['샘플','상황'],content:'이곳에 상황 프롬프트를 입력하세요.\n\n현재 장소: ...\n사건: ...\n등장인물 관계: ...',favorite:false,createdAt:now(),updatedAt:now(),lastUsedAt:0}
+  ];
+
+  let items = load();
+  let activeType = 'all';
+  let activeTag = '';
+
+  function load(){
+    try{
+      const v = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return Array.isArray(v) ? v : sample;
+    }catch(e){ return sample; }
+  }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+  if(!localStorage.getItem(STORAGE_KEY)) save();
+
+  function escapeHtml(str=''){
+    return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  function toast(msg){
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1700);
+  }
+
+  function filtered(){
+    const q = $('#search').value.trim().toLowerCase();
+    const fav = $('#favFilter').value;
+    const sort = $('#sort').value;
+    let out = items.filter(x => {
+      if(activeType !== 'all' && x.type !== activeType) return false;
+      if(activeTag && !(x.tags||[]).includes(activeTag)) return false;
+      if(fav === 'fav' && !x.favorite) return false;
+      if(q){
+        const hay = [x.title, ...(x.tags||[]), x.content].join(' ').toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    out.sort((a,b) => {
+      if(sort==='title') return a.title.localeCompare(b.title,'ko');
+      if(sort==='created') return (b.createdAt||0)-(a.createdAt||0);
+      if(sort==='used') return (b.lastUsedAt||0)-(a.lastUsedAt||0) || (b.updatedAt||0)-(a.updatedAt||0);
+      return (b.updatedAt||0)-(a.updatedAt||0);
+    });
+    return out;
+  }
+
+  function render(){
+    renderTags();
+    const data = filtered();
+    $('#grid').innerHTML = data.map(x => `
+      <article class="card" data-id="${x.id}">
+        <div class="card-top">
+          <div>
+            <div class="card-title">${escapeHtml(x.title)}</div>
+            <div style="margin-top:7px"><span class="badge ${x.type}">${x.type==='person'?'인물':'상황'}</span></div>
+          </div>
+          <button class="star ${x.favorite?'on':''}" data-action="fav" title="즐겨찾기">★</button>
+        </div>
+        <div class="meta">${(x.tags||[]).slice(0,8).map(t=>`<span class="mini-tag">#${escapeHtml(t)}</span>`).join('')}</div>
+        <div class="preview">${escapeHtml(x.content)}</div>
+        <div class="card-actions">
+          <button class="btn primary" data-action="copy">복사</button>
+          <button class="btn" data-action="edit">수정</button>
+          <button class="btn" data-action="duplicate">복제</button>
+          <button class="btn danger" data-action="delete">삭제</button>
+        </div>
+      </article>`).join('');
+    $('#empty').hidden = data.length !== 0;
+    $('#grid').hidden = data.length === 0;
+    const people = items.filter(x=>x.type==='person').length;
+    const situations = items.filter(x=>x.type==='situation').length;
+    const favs = items.filter(x=>x.favorite).length;
+    $('#stats').innerHTML = `<span class="stat">전체 ${items.length}</span><span class="stat">인물 ${people}</span><span class="stat">상황 ${situations}</span><span class="stat">즐겨찾기 ${favs}</span><span class="stat">현재 표시 ${data.length}</span>`;
+  }
+
+  function renderTags(){
+    const counts = new Map();
+    items.forEach(x => (x.tags||[]).forEach(t => counts.set(t,(counts.get(t)||0)+1)));
+    const tags = [...counts.entries()].sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0],'ko'));
+    $('#tagList').innerHTML = tags.length ? tags.map(([t,c])=>`<button class="tag-chip ${activeTag===t?'active':''}" data-tag="${escapeHtml(t)}">${escapeHtml(t)} · ${c}</button>`).join('') : '<span class="help">아직 태그가 없습니다.</span>';
+  }
+
+  async function copyText(text){
+    try{
+      if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; }
+    }catch(e){}
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} ta.remove(); return ok;
+  }
+
+  function openEditor(item){
+    $('#modalTitle').textContent = item ? '프롬프트 수정' : '새 프롬프트';
+    $('#editId').value = item?.id || '';
+    $('#type').value = item?.type || (activeType==='situation'?'situation':'person');
+    $('#title').value = item?.title || '';
+    $('#tags').value = (item?.tags||[]).join(', ');
+    $('#content').value = item?.content || '';
+    $('#editor').showModal();
+    setTimeout(()=>$('#title').focus(),50);
+  }
+
+  function saveEditor(){
+    const title = $('#title').value.trim();
+    const content = $('#content').value;
+    if(!title || !content.trim()){ toast('이름과 본문을 입력하세요.'); return; }
+    const tags = [...new Set($('#tags').value.split(',').map(s=>s.trim()).filter(Boolean))];
+    const id = $('#editId').value;
+    if(id){
+      const x = items.find(v=>v.id===id); if(!x) return;
+      x.type=$('#type').value; x.title=title; x.tags=tags; x.content=content; x.updatedAt=now();
+      toast('수정했습니다.');
+    }else{
+      items.unshift({id:uid(),type:$('#type').value,title,tags,content,favorite:false,createdAt:now(),updatedAt:now(),lastUsedAt:0});
+      toast('추가했습니다.');
+    }
+    save(); render(); $('#editor').close();
+  }
+
+  function exportData(){
+    const payload = {version:1, exportedAt:new Date().toISOString(), items};
+    const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`prompt-library-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href); toast('백업 파일을 만들었습니다.');
+  }
+
+  function importData(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const obj = JSON.parse(reader.result);
+        const data = Array.isArray(obj) ? obj : obj.items;
+        if(!Array.isArray(data)) throw new Error('bad');
+        const cleaned = data.filter(x=>x && x.title && x.content).map(x=>({
+          id:x.id||uid(), type:x.type==='situation'?'situation':'person', title:String(x.title), tags:Array.isArray(x.tags)?x.tags.map(String):[], content:String(x.content), favorite:!!x.favorite,
+          createdAt:Number(x.createdAt)||now(), updatedAt:Number(x.updatedAt)||now(), lastUsedAt:Number(x.lastUsedAt)||0
+        }));
+        if(!confirm(`프롬프트 ${cleaned.length}개를 불러옵니다.\n현재 데이터는 교체됩니다. 계속할까요?`)) return;
+        items = cleaned; save(); activeTag=''; render(); toast('백업을 불러왔습니다.');
+      }catch(e){ alert('올바른 Prompt Library JSON 파일이 아닙니다.'); }
+    };
+    reader.readAsText(file);
+  }
+
+  $('#addBtn').addEventListener('click',()=>openEditor());
+  $('#emptyAdd').addEventListener('click',()=>openEditor());
+  $('#saveBtn').addEventListener('click',e=>{e.preventDefault();saveEditor();});
+  $('#search').addEventListener('input',render);
+  $('#sort').addEventListener('change',render);
+  $('#favFilter').addEventListener('change',render);
+  $('#exportBtn').addEventListener('click',exportData);
+  $('#importBtn').addEventListener('click',()=>$('#importFile').click());
+  $('#importFile').addEventListener('change',e=>{const f=e.target.files?.[0]; if(f) importData(f); e.target.value='';});
+  $('#clearTag').addEventListener('click',()=>{activeTag='';render();});
+  $$('.tab').forEach(btn=>btn.addEventListener('click',()=>{activeType=btn.dataset.type;$$('.tab').forEach(b=>b.classList.toggle('active',b===btn));render();}));
+  $('#tagList').addEventListener('click',e=>{const b=e.target.closest('[data-tag]');if(!b)return;activeTag=b.dataset.tag;render();});
+  $('#grid').addEventListener('click',async e=>{
+    const card=e.target.closest('.card'); if(!card)return; const x=items.find(v=>v.id===card.dataset.id); if(!x)return;
+    const action=e.target.closest('[data-action]')?.dataset.action; if(!action)return;
+    if(action==='copy'){ const ok=await copyText(x.content); if(ok){x.lastUsedAt=now();save();render();toast(`“${x.title}” 복사 완료`);} else alert('클립보드 복사에 실패했습니다. 브라우저 권한을 확인하세요.'); }
+    if(action==='edit') openEditor(x);
+    if(action==='fav'){x.favorite=!x.favorite;x.updatedAt=now();save();render();}
+    if(action==='duplicate'){items.unshift({...x,id:uid(),title:x.title+' 복사본',favorite:false,createdAt:now(),updatedAt:now(),lastUsedAt:0});save();render();toast('복제했습니다.');}
+    if(action==='delete'){if(confirm(`“${x.title}”을 삭제할까요?`)){items=items.filter(v=>v.id!==x.id);save();render();toast('삭제했습니다.');}}
+  });
+
+  // 단축키: Ctrl/Cmd + K 검색, Ctrl/Cmd + N 새 항목
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#search').focus();}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='n'){e.preventDefault();openEditor();}
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
