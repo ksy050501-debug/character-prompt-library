@@ -6,6 +6,8 @@
 <title>Prompt Library</title>
 <link rel="stylesheet" href="./style.css">
 <link rel="stylesheet" href="./tag-enhancements.css">
+<link rel="stylesheet" href="./tag-manager.css">
+<link rel="stylesheet" href="./url-fix.css">
 </head>
 <body>
 <div class="app">
@@ -20,7 +22,7 @@
   </div>
 
   <div class="toolbar"><input class="search" id="search" placeholder="이름, 태그, 프롬프트 내용 검색..."><select id="sort"><option value="updated">최근 수정순</option><option value="used">최근 사용순</option><option value="title">이름순</option><option value="created">최근 생성순</option></select><select id="favFilter"><option value="all">전체</option><option value="fav">즐겨찾기만</option></select></div>
-  <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button></div>
+  <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button><button class="tab" id="manageTagsBtn" type="button">태그 관리</button></div>
   <div class="stats" id="stats"></div>
   <div class="layout">
     <aside class="sidebar"><div class="sub">태그 필터</div><div class="tag-list" id="tagList"></div><button class="btn" id="clearTag" style="width:100%">태그 필터 해제</button><div class="help" style="margin-top:10px">데이터는 이 브라우저의 로컬 저장소에 저장됩니다. 기기 변경·브라우저 초기화에 대비해 가끔 백업을 내보내세요.</div></aside>
@@ -31,8 +33,27 @@
 <dialog id="editor"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="modalTitle">새 프롬프트</h2><button class="close" value="cancel">×</button></div><div class="modal-body"><input type="hidden" id="editId"><div class="row2"><div class="field"><label>분류</label><select id="type"><option value="person">인물</option><option value="situation">상황</option></select></div><div class="field"><label>이름</label><input id="title" required placeholder="예: 이세리 / 첫 만남"></div></div><div class="field"><label>태그</label><input id="tags" placeholder="쉼표로 구분: WERA, 지부장, S급"><div class="help">기존 태그를 클릭하면 자동으로 추가되며, 다시 클릭하면 해제됩니다.</div><div class="existing-tags" id="existingTagList"></div></div><div class="field"><label>프롬프트 본문</label><textarea id="content" required placeholder="복사할 프롬프트 전체 내용을 입력하세요."></textarea></div></div><div class="modal-foot"><button class="btn" value="cancel">취소</button><button class="btn primary" id="saveBtn" value="default">저장</button></div></form></dialog>
 
 <dialog id="viewer"><div class="modal-head"><h2 id="viewerTitle">프롬프트 보기</h2><button class="close" id="viewerClose">×</button></div><div class="viewer-body"><div class="viewer-meta" id="viewerMeta"></div><div class="viewer-content" id="viewerContent"></div></div><div class="modal-foot"><button class="btn" id="viewerEdit">수정</button><button class="btn primary" id="viewerCopy">복사</button></div></dialog>
+
+<dialog id="tagManager" class="tag-manager">
+  <div class="modal-head"><h2>태그 관리</h2><button class="close" id="closeTagManager" type="button">×</button></div>
+  <div class="tag-manager-body">
+    <section class="tag-manager-left">
+      <div class="tag-create"><input id="newTagName" placeholder="새 태그 이름"><button class="btn primary" id="addManagedTag" type="button">추가</button></div>
+      <div class="manage-tag-list" id="manageTagList"></div>
+      <button class="btn danger" id="deleteManagedTag" type="button">선택한 태그 삭제</button>
+    </section>
+    <section class="tag-manager-right">
+      <div><b id="selectedTagName">태그를 선택하세요</b><div class="tag-manager-summary" id="tagSelectionCount"></div></div>
+      <div class="tag-manager-toolbar"><input class="search" id="tagPromptSearch" placeholder="프롬프트 검색..."><button class="btn" id="selectAllPrompts" type="button">현재 목록 전체 선택</button><button class="btn" id="clearAllPrompts" type="button">현재 목록 전체 해제</button></div>
+      <div class="tag-prompt-list" id="tagPromptList"></div>
+    </section>
+  </div>
+  <div class="modal-foot"><button class="btn" id="closeTagManager" type="button">취소</button><button class="btn primary" id="applyTagManager" type="button">변경사항 적용</button></div>
+</dialog>
+
 <div class="toast" id="toast"></div>
 <script src="./app.js"></script>
 <script src="./tag-enhancements.js"></script>
+<script src="./tag-manager.js"></script>
 </body>
 </html>
