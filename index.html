@@ -22,7 +22,7 @@
   </div>
 
   <div class="toolbar"><input class="search" id="search" placeholder="이름, 태그, 프롬프트 내용 검색..."><select id="sort"><option value="updated">최근 수정순</option><option value="used">최근 사용순</option><option value="title">이름순</option><option value="created">최근 생성순</option></select><select id="favFilter"><option value="all">전체</option><option value="fav">즐겨찾기만</option></select></div>
-  <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button><button class="tab" id="manageTagsBtn" type="button">태그 관리</button></div>
+  <div class="tabs"><button class="tab active" data-type="all">전체</button><button class="tab" data-type="person">인물별</button><button class="tab" data-type="situation">상황별</button><button class="tag-manage-tab" id="manageTagsBtn" type="button">태그 관리</button></div>
   <div class="stats" id="stats"></div>
   <div class="layout">
     <aside class="sidebar"><div class="sub">태그 필터</div><div class="tag-list" id="tagList"></div><button class="btn" id="clearTag" style="width:100%">태그 필터 해제</button><div class="help" style="margin-top:10px">데이터는 이 브라우저의 로컬 저장소에 저장됩니다. 기기 변경·브라우저 초기화에 대비해 가끔 백업을 내보내세요.</div></aside>
@@ -48,7 +48,7 @@
       <div class="tag-prompt-list" id="tagPromptList"></div>
     </section>
   </div>
-  <div class="modal-foot"><button class="btn" id="closeTagManager" type="button">취소</button><button class="btn primary" id="applyTagManager" type="button">변경사항 적용</button></div>
+  <div class="modal-foot"><button class="btn" id="cancelTagManager" type="button">취소</button><button class="btn primary" id="applyTagManager" type="button">변경사항 적용</button></div>
 </dialog>
 
 <div class="toast" id="toast"></div>
